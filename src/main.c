@@ -134,12 +134,12 @@ static void sound_settings(void) {
     sound_timer = 12;
 }
 
-/* Bienvenida: acorde de Do mayor al iniciar */
+/* Bienvenida: campanilla (PULSE + TRIANGLE) */
 static void sound_welcome(void) {
-    sound_play(0, NOTE_C4, SID_SAWTOOTH, 0, 8, 12, 10);
-    sound_play(1, NOTE_E4, SID_TRIANGLE, 0, 8, 12, 10);
-    sound_play(2, NOTE_G4, SID_TRIANGLE, 0, 8, 12, 10);
-    sound_timer = 35;  /* ~1.75s */
+    sound_play(0, NOTE_C5, SID_PULSE, 0, 8, 10, 10);
+    sound_play(1, NOTE_E4, SID_TRIANGLE, 0, 8, 6, 8);
+    sound_play(2, NOTE_G4, SID_PULSE, 0, 8, 4, 8);
+    sound_timer = 35;
 }
 
 /* Advertencia ultimos 10 segundos: beep corto y seco */
