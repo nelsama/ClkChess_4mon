@@ -93,6 +93,13 @@ static uint8_t blink_state;         /* 1 = visible, 0 = oculto */
 
 static uint8_t sound_timer;         /* Timer para apagar sonidos sostenidos */
 
+/* Forzar silencio total en una voz (escribe 0 en control) */
+static void sound_kill(uint8_t voice) {
+    if (voice == 0)      SID_V1_CTRL = 0;
+    else if (voice == 1) SID_V2_CTRL = 0;
+    else                 SID_V3_CTRL = 0;
+}
+
 /* ============================================================================
  * SONIDOS SID (no bloqueantes - el envelope ADSR maneja la duracion)
  * ============================================================================ */
@@ -101,9 +108,11 @@ static uint8_t sound_timer;         /* Timer para apagar sonidos sostenidos */
 static void sound_play(uint8_t voice, uint16_t freq, uint8_t wave,
                        uint8_t a, uint8_t d, uint8_t s, uint8_t r) {
     sid_gate_off(voice);
-    rom_delay_us(500);  /* Esperar a que el SID registre gate=0 */
+    rom_delay_us(300);
+    sound_kill(voice);           /* Apagar oscilador por completo */
+    rom_delay_us(300);
     sid_voice(voice, freq, wave, a, d, s, r);
-    rom_delay_us(500);  /* Esperar a que el SID registre nuevos params */
+    rom_delay_us(300);
     sid_gate_on(voice);
 }
 
@@ -636,9 +645,9 @@ int main(void) {
         if (sound_timer > 0) {
             sound_timer--;
             if (sound_timer == 0) {
-                sid_gate_off(0);
-                sid_gate_off(1);
-                sid_gate_off(2);
+                sound_kill(0);
+                sound_kill(1);
+                sound_kill(2);
             }
         }
         
