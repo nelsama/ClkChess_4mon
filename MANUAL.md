@@ -72,16 +72,16 @@ R 0800
 El módulo QYF-TM1638 tiene 16 botones táctiles organizados en 4 filas × 4 columnas:
 
 ```
-[ 1] [ 2] [ 3] [P1]      ← Fila 1
-[ 5] [ 6] [ 7] [P2]      ← Fila 2
+[ 1] [ 2] [ 3] [P1]      ← P1 = Blancas
+[ 5] [ 6] [ 7] [P2]      ← P2 = Negras
 [ 9] [10] [11] [RST]     ← Fila 3
 [ -] [ 0] [PAU] [SET]    ← Fila 4
 ```
 
 | Tecla | Nº | Función |
 |-------|----|---------|
-| **P1** | 4 | Finalizar turno del Jugador 1 |
-| **P2** | 8 | Finalizar turno del Jugador 2 |
+| **P1** | 4 | Finalizar turno de Blancas |
+| **P2** | 8 | Finalizar turno de Negras |
 | **RST** | 12 | Reiniciar partida |
 | **PAU** | 15 | Pausar / Reanudar |
 | **SET** | 16 | Configuración (mantener 1 segundo) |
@@ -100,11 +100,11 @@ El display de 8 dígitos muestra **ambos tiempos simultáneamente**:
 ```
 05.00 05.00
 ^^^^    ^^^^
- P1      P2
+ BL      NG
 ```
 
-- **Izquierda** (dígitos 0-3): tiempo del Jugador 1
-- **Derecha** (dígitos 4-7): tiempo del Jugador 2
+- **Izquierda** (dígitos 0-3): tiempo de **Blancas**
+- **Derecha** (dígitos 4-7): tiempo de **Negras**
 - **Punto decimal** en dígitos 1 y 5: separa minutos de segundos
 
 ### Modos de visualización
@@ -113,11 +113,11 @@ El display de 8 dígitos muestra **ambos tiempos simultáneamente**:
 |------|---------|-------------|
 | Inicio | `CHESS1.0` | Banner de versión (1.5s) |
 | Detenido | `05.00 05.00` | Esperando iniciar partida |
-| Partida activa | `04.35 05.00` | P1 activo, P2 titila |
+| Partida activa | `04.35 05.00` | Blancas activas, Negras titilan |
 | Pausa | ` PAUSADO ` | Partida pausada |
 | Configuración | `SET  05  ` | Ajustando minutos |
-| Game Over | `P1 TIME!` | Jugador 1 perdió |
-| Game Over | `P2 TIME!` | Jugador 2 perdió |
+| Game Over | `BL LOST ` | Blancas perdieron |
+| Game Over | `NG LOST ` | Negras perdieron |
 
 ### Parpadeo
 
@@ -134,8 +134,8 @@ El jugador **activo** se ve siempre fijo para que pueda leer su tiempo sin distr
 ### Iniciar una partida
 
 1. Al cargar, el display muestra `05.00 05.00` (5 minutos cada uno)
-2. Presione **P1** o **P2** para comenzar
-3. El reloj del **Jugador 1** arranca la cuenta regresiva
+2. Presione **P1** (Blancas) o **P2** (Negras) para comenzar
+3. El reloj de **Blancas** arranca la cuenta regresiva (Blancas siempre abren)
 4. Se escucha un **click** (confirmación de tecla) y un **tono** (cambio de turno)
 
 ### Alternar turnos
@@ -147,7 +147,7 @@ Cuando un jugador termina su movimiento:
 3. El reloj del oponente **se inicia**
 4. Se escucha el tono de cambio de turno
 
-> **Importante:** Cada jugador presiona **su propio botón**. No importa qué botón se presione para iniciar la partida (P1 o P2), el Jugador 1 siempre empieza contando.
+> **Importante:** Blancas usan el botón **P1**, Negras usan el botón **P2**. No importa qué botón se presione para iniciar, las Blancas siempre empiezan contando.
 
 ### Pausar y reanudar
 
@@ -160,14 +160,14 @@ Cuando un jugador termina su movimiento:
 
 - Presione **RST** en cualquier momento
 - Ambos relojes vuelven al tiempo configurado
-- El estado vuelve a "detenido" — debe presionar P1 o P2 para iniciar
+- El estado vuelve a "detenido" — debe presionar P1 (Blancas) o P2 (Negras) para iniciar
 
 ### Fin de la partida
 
 Cuando un jugador se queda sin tiempo:
 
-1. El display muestra `P1 TIME!` o `P2 TIME!`
-2. Suena un acorde grave (2 voces)
+1. El display muestra `BL LOST ` (Blancas perdieron) o `NG LOST ` (Negras perdieron)
+2. Suena un acorde grave (3 voces)
 3. El registro UART indica el ganador (el que no perdió)
 4. Presione **RST** para reiniciar
 
@@ -189,7 +189,7 @@ Escriba la letra **`q`** (minúscula o mayúscula) en la terminal UART. El progr
 3. Use **+ (10)** para aumentar o **- (9)** para disminuir
 4. Rango: **1 a 99 minutos**
 5. Presione **SET** nuevamente para guardar
-6. También puede presionar **P1** o **P2** para guardar e iniciar partida inmediatamente
+6. También puede presionar **P1** (Blancas) o **P2** (Negras) para guardar e iniciar inmediatamente
 
 ### Valores recomendados
 
@@ -241,15 +241,15 @@ La terminal UART muestra un registro detallado de la partida. Es opcional — el
 ================================================
 -- Reloj de Ajedrez iniciado --
 Tiempo: 05:00 por jugador
-Presione P1 o P2 para iniciar
+Presione BL (P1) o NG (P2) para iniciar
 -- Partida iniciada --
-Jugador 1: 05:00  Jugador 2: 05:00
-Turno del Jugador 1
-Jugador 1 presiona - Turno del Jugador 2 (P1:04:47  P2:05:00)
-Jugador 2 presiona - Turno del Jugador 1 (P1:04:47  P2:04:52)
+Blancas: 05:00  Negras: 05:00
+Turno de Blancas
+Blancas presiona - Turno de Negras (B:04:47  N:05:00)
+Negras presiona - Turno de Blancas (B:04:47  N:04:52)
 -- Partida pausada --
 -- Partida reanudada --
-*** Jugador 1 se quedo sin tiempo!
+*** Blancas sin tiempo!
 -- Fin de la partida --
 ```
 
