@@ -139,19 +139,6 @@ static void sound_settings(void) {
     kill_timer = 0;
 }
 
-/* Bienvenida: ding corto con kill rapido */
-static void sound_welcome(void) {
-    sound_play(0, NOTE_C6, SID_PULSE, 0, 2, 0, 1);
-    SID_V1_PW_HI = 2048 >> 8;
-    SID_V1_PW_LO = 2048 & 0xFF;
-    sound_play(1, NOTE_E5, SID_TRIANGLE, 0, 2, 0, 1);
-    sound_play(2, NOTE_G5, SID_PULSE, 0, 2, 0, 1);
-    SID_V3_PW_HI = 2048 >> 8;
-    SID_V3_PW_LO = 2048 & 0xFF;
-    sound_timer = 1;    /* 1 tick ~50ms */
-    kill_timer = 2;     /* 1 tick gate_off + 2 ticks = kill total ~150ms */
-}
-
 /* Advertencia ultimos 10 segundos: beep corto y seco */
 static void sound_warning(void) {
     sound_play(0, NOTE_C7, SID_SAWTOOTH, 0, 4, 0, 2);
