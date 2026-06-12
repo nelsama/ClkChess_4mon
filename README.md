@@ -7,7 +7,7 @@ Reloj de ajedrez digital para dos jugadores con sonido, basado en el **Monitor 6
 ## Características
 
 - 🕐 **Dos jugadores** con tiempos independientes y cuenta regresiva
-- 👁️ **Display simultáneo**: muestra ambos tiempos en 8 dígitos
+- 👁️ **Display simultáneo**: muestra ambos tiempos (Blancas a izq., Negras a der.)
 - 🔊 **Sonido SID**: efectos por teclas, turnos, advertencias y game over
 - 💤 **Parpadeo inteligente**: el jugador en espera titila suavemente
 - ⚙️ **Tiempo configurable**: de 1 a 99 minutos
@@ -50,8 +50,8 @@ Reloj de ajedrez digital para dos jugadores con sonido, basado en el **Monitor 6
 ## Distribución del Teclado TM1638
 
 ```
-[ 1] [ 2] [ 3] [P1]  ← P1 (4)  = Finalizar turno Jugador 1
-[ 5] [ 6] [ 7] [P2]  ← P2 (8)  = Finalizar turno Jugador 2
+[ 1] [ 2] [ 3] [P1]  ← P1 (4)  = Blancas
+[ 5] [ 6] [ 7] [P2]  ← P2 (8)  = Negras
 [ 9] [10] [11] [RST] ← RST(12) = Reiniciar partida
 [ -] [ 0] [PAU] [SET]← PAU(15) = Pausa/Reanudar
                          SET(16) = Configuración (mantener 1s)
@@ -68,19 +68,19 @@ Los 8 dígitos muestran ambos tiempos simultáneamente. El punto decimal (DP) en
 ^^^^    ^^^^
  P1      P2
 
-Normal:    "05.00 05.00"  →  P1: 05:00 | P2: 05:00
+Normal:    "05.00 05.00"  →  Blancas: 05:00 | Negras: 05:00
 Parpadeo:   "05.00" fijo, "    " titila  →  el que espera titila
 Config:    "SET  05  "    →  Configurando tiempo
 Pausa:     " PAUSADO "    →  Partida pausada
-Game Over: "P1 TIME!"     →  Jugador 1 perdió
-           "P2 TIME!"     →  Jugador 2 perdió
+Game Over: "BL LOST "     →  Blancas perdieron
+           "NG LOST "     →  Negras perdieron
 ```
 
 ## Sonidos SID
 
 | Evento | Sonido | Descripción |
 |--------|--------|-------------|
-| Presionar P1/P2/RST | Click | Ruido blanco (NOISE C7), muy corto |
+| Presionar tecla | Click | Ruido blanco (NOISE C7), muy corto |
 | Cambio de turno | Tono | Onda triangular (TRIANGLE A5) |
 | Últimos 10s | Beep | Onda pulsada (PULSE C7) cada segundo |
 | Game Over | Acorde grave | 2 voces (SAWTOOTH C3 + G3) |
@@ -97,15 +97,15 @@ LOAD CHESS 0800
 R 0800
 ```
 
-El display muestra `CHESS1.0` y luego `05.00 05.00` (5 min por jugador).
+El display muestra `CHESS1.0` y luego `05.00 05.00` (5 min c/u — Blancas izq., Negras der.).
 
 ### 2. Empezar partida
 
-Presione **P1** o **P2**. El reloj del Jugador 1 arranca la cuenta regresiva. Se escucha un **click** y un **tono** de cambio de turno.
+Presione **P1** (Blancas) o **P2** (Negras). El reloj de Blancas arranca la cuenta regresiva (Blancas siempre abren). Se escucha un **click** y un **tono** de cambio de turno.
 
 ### 3. Alternar turnos
 
-El jugador activo presiona su botón (**P1** o **P2**) para detener su reloj e iniciar el del oponente. El jugador en espera titila suavemente (500ms visible / 150ms oculto).
+El jugador activo presiona su botón (**P1** = Blancas o **P2** = Negras) para detener su reloj e iniciar el del oponente. El jugador en espera titila suavemente (500ms visible / 150ms oculto).
 
 ### 4. Pausa
 
@@ -133,8 +133,8 @@ Cada movimiento se registra automáticamente:
   Version 1.0.0
 ================================================
 Teclado TM1638:
-  [ 1] [ 2] [ 3] [P1]    P1 = Jugador 1
-  [ 5] [ 6] [ 7] [P2]    P2 = Jugador 2
+  [ 1] [ 2] [ 3] [P1]    P1 = Blancas
+  [ 5] [ 6] [ 7] [P2]    P2 = Negras
   [ 9] [10] [11] [RST]   RST = Reiniciar
   [ -] [ 0] [PAU] [SET]  PAU = Pausa, SET = Config
   9(-) y 10(+) ajustan tiempo en config
@@ -143,15 +143,15 @@ Escriba 'q' para salir
 
 -- Reloj de Ajedrez iniciado --
 Tiempo: 05:00 por jugador
-Presione P1 o P2 para iniciar
+Presione BL (P1) o NG (P2) para iniciar
 -- Partida iniciada --
-Jugador 1: 05:00  Jugador 2: 05:00
-Turno del Jugador 1
-Jugador 1 presiona - Turno del Jugador 2 (P1:04:47  P2:05:00)
-Jugador 2 presiona - Turno del Jugador 1 (P1:04:47  P2:04:52)
+Blancas: 05:00  Negras: 05:00
+Turno de Blancas
+Blancas presiona - Turno de Negras (B:04:47  N:05:00)
+Negras presiona - Turno de Blancas (B:04:47  N:04:52)
 -- Partida pausada --
 -- Partida reanudada --
-*** Jugador 1 se quedo sin tiempo!
+*** Blancas sin tiempo!
 -- Fin de la partida --
 ```
 
@@ -160,10 +160,10 @@ Jugador 2 presiona - Turno del Jugador 1 (P1:04:47  P2:04:52)
 | Estado | Display | Sonido | Descripción |
 |--------|---------|--------|-------------|
 | `STOPPED` | `05.00 05.00` | — | Esperando iniciar |
-| `RUNNING` | `04.30 05.00` (P1 titila) | Click + tono turno | Partida en curso |
+| `RUNNING` | `04.30 05.00` (Negras titila) | Click + tono turno | Blancas activas |
 | `PAUSED` | ` PAUSADO ` | Tono C5 | Ambos detenidos |
 | `SETTINGS` | `SET  05  ` | — | Configurando tiempo |
-| `GAME_OVER` | `P1 TIME!` | Acorde grave (C3+G3) | Tiempo agotado |
+| `GAME_OVER` | `BL LOST ` | Acorde grave (C4+E4+G4) | Blancas perdieron |
 
 ## Precisión
 
