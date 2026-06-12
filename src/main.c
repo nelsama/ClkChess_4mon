@@ -119,16 +119,19 @@ static void sound_play(uint8_t voice, uint16_t freq, uint8_t wave,
 /* Click al presionar tecla */
 static void sound_click(void) {
     sound_play(0, NOTE_C7, SID_NOISE, 0, 8, 0, 2);
+    sound_timer = 8;  /* ~400ms, luego kill */
 }
 
 /* Cambio de turno */
 static void sound_switch(void) {
     sound_play(0, NOTE_A5, SID_TRIANGLE, 0, 6, 0, 4);
+    sound_timer = 8;
 }
 
-/* Advertencia ultimos 10 segundos: beep corto y seco (sustain=0 se apaga solo) */
+/* Advertencia ultimos 10 segundos: beep corto y seco */
 static void sound_warning(void) {
     sound_play(0, NOTE_C7, SID_SAWTOOTH, 0, 4, 0, 2);
+    sound_timer = 6;  /* ~300ms */
 }
 
 /* Fin del juego: acorde sostenido y fuerte (3 voces) */
@@ -136,17 +139,19 @@ static void sound_game_over(void) {
     sound_play(0, NOTE_C4, SID_SAWTOOTH, 0, 8, 10, 10);
     sound_play(1, NOTE_E4, SID_SAWTOOTH, 0, 8, 10, 10);
     sound_play(2, NOTE_G4, SID_SAWTOOTH, 0, 8, 10, 10);
-    sound_timer = 60;  /* Apagar tras ~3 segundos (60 ticks * 50ms) */
+    sound_timer = 60;  /* ~3 segundos */
 }
 
 /* Pausa */
 static void sound_pause(void) {
     sound_play(0, NOTE_C5, SID_TRIANGLE, 0, 8, 0, 6);
+    sound_timer = 10;
 }
 
 /* Reanudar */
 static void sound_resume(void) {
     sound_play(0, NOTE_E5, SID_TRIANGLE, 0, 8, 0, 6);
+    sound_timer = 10;
 }
 
 /* ============================================================================
