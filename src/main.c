@@ -683,25 +683,30 @@ int main(void) {
             }
         }
         
-        /* Timer de sonido: fase 1 - gate_off + inicio fade de volumen */
+        /* Timer de sonido: fase 1 - fin del sustain */
         if (sound_timer > 0) {
             sound_timer--;
             if (sound_timer == 0) {
-                sid_gate_off(0);
-                sid_gate_off(1);
-                sid_gate_off(2);
-                kill_timer = 8;   /* ~400ms de fade out por volumen */
+                kill_timer = 5;   /* ~250ms de fade out */
             }
         }
         
-        /* Timer de sonido: fase 2 - fade out progresivo del volumen */
+        /* Timer de sonido: fase 2 - fade out del volumen */
         if (kill_timer > 0) {
-            kill_timer--;
-            {
-                /* Volumen proporcional: 15, 13, 11, 9, 7, 5, 3, 1, 0 */
-                uint8_t vol = (uint8_t)(((uint16_t)kill_timer * 15 + 7) / 8);
-                sid_volume(vol);
+            uint8_t vol;
+            /* Escala exponencial: 15, 10, 6, 3, 1, 0 */
+            switch (kill_timer) {
+                case 5: vol = 10; break;
+                case 4: vol = 6;  break;
+                case 3: vol = 3;  break;
+                case 2: vol = 1;  break;
+                default: vol = 0; break;
             }
+            sid_volume(vol);
+            sid_gate_off(0);
+            sid_gate_off(1);
+            sid_gate_off(2);
+            kill_timer--;
             if (kill_timer == 0) {
                 sid_volume(0);
                 sound_kill(0);
