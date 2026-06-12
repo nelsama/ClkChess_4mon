@@ -629,17 +629,47 @@ int main(void) {
     
     /* Mostrar banner en display con sonido de bienvenida */
     tm1638_show_text(VERSION_DISPLAY);
-    sound_welcome();
-    rom_delay_ms(300);          /* 300ms sustain */
-    sid_gate_off(0);
-    sid_gate_off(1);
-    sid_gate_off(2);
-    rom_delay_ms(300);          /* 300ms release fade */
-    sound_kill(0);
-    sound_kill(1);
-    sound_kill(2);
-    sid_volume(15);             /* Restaurar volumen */
-    rom_delay_ms(900);          /* Resto del banner ~1.5s total */
+    {
+        /* Garry Owen - Voz 0 melodia, Voz 1 armonia, Voz 2 bajo */
+        /* Frase 1 */
+        sid_voice(0, NOTE_G5, SID_PULSE, 0, 4, 10, 8);
+        sid_voice(1, NOTE_D5, SID_TRIANGLE, 0, 4, 8, 8);
+        sid_voice(2, NOTE_G4, SID_TRIANGLE, 0, 4, 6, 8);
+        SID_V1_PW_HI = 2048 >> 8; SID_V1_PW_LO = 2048 & 0xFF;
+        sid_gate_on(0); sid_gate_on(1); sid_gate_on(2);
+        rom_delay_ms(200);
+        /* ra */
+        sid_freq(0, NOTE_E5); sid_freq(1, NOTE_B4); sid_freq(2, NOTE_E4);
+        rom_delay_ms(100);
+        /* ra */
+        sid_freq(0, NOTE_G5); sid_freq(1, NOTE_D5); sid_freq(2, NOTE_G4);
+        rom_delay_ms(100);
+        /* tan */
+        sid_freq(0, NOTE_E5); sid_freq(1, NOTE_B4); sid_freq(2, NOTE_E4);
+        rom_delay_ms(200);
+        /* tan */
+        sid_freq(0, NOTE_G5); sid_freq(1, NOTE_D5); sid_freq(2, NOTE_G4);
+        rom_delay_ms(200);
+        
+        /* Frase 2 */
+        sid_freq(0, NOTE_G5); sid_freq(1, NOTE_D5); sid_freq(2, NOTE_G4);
+        rom_delay_ms(200);
+        sid_freq(0, NOTE_E5); sid_freq(1, NOTE_B4); sid_freq(2, NOTE_E4);
+        rom_delay_ms(100);
+        sid_freq(0, NOTE_G5); sid_freq(1, NOTE_D5); sid_freq(2, NOTE_G4);
+        rom_delay_ms(100);
+        sid_freq(0, NOTE_E5); sid_freq(1, NOTE_B4); sid_freq(2, NOTE_E4);
+        rom_delay_ms(200);
+        sid_freq(0, NOTE_G5); sid_freq(1, NOTE_D5); sid_freq(2, NOTE_G4);
+        rom_delay_ms(200);
+        
+        /* Fade out */
+        sid_gate_off(0); sid_gate_off(1); sid_gate_off(2);
+        rom_delay_ms(300);
+        sound_kill(0); sound_kill(1); sound_kill(2);
+        sid_volume(15);
+    }
+    rom_delay_ms(500);  /* Resto del banner */
     
     /* Inicializar tiempo por defecto */
     init_time = DEFAULT_MINUTES * 60;
