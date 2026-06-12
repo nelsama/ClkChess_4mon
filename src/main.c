@@ -617,8 +617,8 @@ int main(void) {
     /* Mostrar banner en display con sonido de bienvenida */
     tm1638_show_text(VERSION_DISPLAY);
     {
-        /* Garry Owen - Voz 0 melodia, Voz 1 armonia, Voz 2 bajo */
-        /* Frase 1 */
+        /* Garry Owen - volumen bajo para no asustar */
+        sid_volume(5);
         sid_voice(0, NOTE_G5, SID_PULSE, 0, 4, 10, 8);
         sid_voice(1, NOTE_D5, SID_TRIANGLE, 0, 4, 8, 8);
         sid_voice(2, NOTE_G4, SID_TRIANGLE, 0, 4, 6, 8);
