@@ -214,12 +214,12 @@ El Reloj de Ajedrez usa el chip **SID 6581** con 3 voces independientes. Todos l
 
 | Evento | Voz | Onda | Nota | Duración | Descripción |
 |--------|-----|------|------|----------|-------------|
-| Presionar tecla | 0 | Noise | C7 | ~100ms | Click de confirmación |
-| Cambio de turno | 0 | Triangle | A5 | ~200ms | Tono suave ascendente |
-| Alarma (≤10s) | 0 | Pulse | C7 | ~200ms | Beep cada segundo |
-| Game Over | 0, 1 | Sawtooth | C3+G3 | ~500ms | Acorde grave descendente |
-| Pausa | 0 | Triangle | C5 | ~300ms | Tono único |
-| Reanudar | 0 | Triangle | E5 | ~300ms | Tono único |
+| Presionar tecla | 0 | Noise | C7 | ~200ms | Click de confirmación |
+| Cambio de turno | 0 | Triangle | A5 | ~250ms | Tono suave ascendente |
+| Alarma (≤10s) | 0 | Sawtooth | C7 | ~200ms | Beep cada segundo |
+| Game Over | 0, 1, 2 | Sawtooth | C4+E4+G4 | ~3s | Acorde grave completo (3 voces) |
+| Pausa | 0 | Triangle | C5 | ~400ms | Tono único |
+| Reanudar | 0 | Triangle | E5 | ~400ms | Tono único |
 | Salir (q) | todas | — | — | — | Silencio total |
 
 ### Volumen
@@ -292,7 +292,7 @@ Negras presiona - Turno de Blancas (B:04:47  N:04:52)
 | Sonido | SID 6581, 3 voces, 4 formas de onda |
 | Tiempo máximo | 99:59 por jugador |
 | Precisión | ~1s por minuto |
-| Tamaño del binario | ~9.5 KB |
+| Tamaño del binario | ~9.8 KB |
 | Memoria usada | $0800-$3FFF (~13KB disponibles) |
 
 ### Mapa de memoria

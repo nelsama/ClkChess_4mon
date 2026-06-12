@@ -80,12 +80,12 @@ Game Over: "BL LOST "     →  Blancas perdieron
 
 | Evento | Sonido | Descripción |
 |--------|--------|-------------|
-| Presionar tecla | Click | Ruido blanco (NOISE C7), muy corto |
-| Cambio de turno | Tono | Onda triangular (TRIANGLE A5) |
-| Últimos 10s | Beep | Onda pulsada (PULSE C7) cada segundo |
-| Game Over | Acorde grave | 2 voces (SAWTOOTH C3 + G3) |
-| Pausa | Tono C5 | Onda triangular suave |
-| Reanudar | Tono E5 | Onda triangular suave |
+| Presionar tecla | Click | Ruido blanco (NOISE C7), ~200ms |
+| Cambio de turno | Tono | Onda triangular (TRIANGLE A5), ~250ms |
+| Últimos 10s | Beep | Onda sierra (SAWTOOTH C7), ~200ms c/u |
+| Game Over | Acorde grave | 3 voces (SAWTOOTH C4+E4+G4), ~3s |
+| Pausa | Tono C5 | Onda triangular, ~400ms |
+| Reanudar | Tono E5 | Onda triangular, ~400ms |
 
 ## Cómo usar
 
@@ -208,7 +208,7 @@ make clean  # Limpiar
 make info   # Ver tamaño del binario
 ```
 
-El binario se genera en `output/chess-clock.bin` (~9.5KB).
+El binario se genera en `output/chess-clock.bin` (~9.8KB).
 
 ## Instalación en la Tang Nano 9K
 
