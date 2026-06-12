@@ -18,7 +18,7 @@
  *   Normal:   "MMSSMMSS"  →  P1:MM:SS  P2:MM:SS  (sin separadores)
  *   Config:   "SET  XX:YY" → Configurando tiempo base
  *   Pausa:    "  PAUSADO " 
- *   Game Over: "P1  TIME!" o "P2  TIME!"
+ *   Game Over: "BL LOST " o "NG LOST "
  * 
  * UART:
  *   Escriba "quit" o "q" + Enter para volver al monitor 6502.
@@ -234,14 +234,14 @@ static void show_message(const char *msg) {
  * FUNCIONES DEL RELOJ
  * ============================================================================ */
 
-/* Iniciar partida: arranca el reloj del Jugador 1 */
+/* Iniciar partida: arranca el reloj de Blancas */
 static void clock_start(void) {
     state = CLOCK_RUNNING;
     active_player = 1;
-    blink_state = 1;  /* Mostrar inmediatamente */
+    blink_state = 1;
     blink_counter = 0;
     uart_print("-- Partida iniciada --\r\n");
-    uart_print("Jugador 1: ");
+    uart_print("Blancas: ");
     {
         char buf[10];
         uint8_t m = p1_time / 60;
@@ -254,7 +254,7 @@ static void clock_start(void) {
         buf[5] = '\0';
         uart_print(buf);
     }
-    uart_print("  Jugador 2: ");
+    uart_print("  Negras: ");
     {
         char buf[10];
         uint8_t m = p2_time / 60;
@@ -268,7 +268,7 @@ static void clock_start(void) {
         uart_print(buf);
     }
     uart_print("\r\n");
-    uart_print("Turno del Jugador 1\r\n");
+    uart_print("Turno de Blancas\r\n");
 }
 
 /* Finalizar turno del jugador actual */
@@ -278,23 +278,20 @@ static void clock_switch_player(void) {
     if (state == CLOCK_GAME_OVER) return;
     
     if (state == CLOCK_STOPPED) {
-        /* Primera pulsación: iniciar partida */
         clock_start();
         return;
     }
     
     if (state == CLOCK_RUNNING) {
-        /* Cambiar al otro jugador */
         new_player = (active_player == 1) ? 2 : 1;
-        blink_state = 1;  /* Mostrar inmediatamente al nuevo jugador */
+        blink_state = 1;
         blink_counter = 0;
-        sound_switch();  /* Sonido de cambio de turno */
+        sound_switch();
         
-        uart_print("Jugador ");
-        rom_uart_putc('0' + active_player);
-        uart_print(" presiona - Turno del Jugador ");
-        rom_uart_putc('0' + new_player);
-        uart_print(" (P1:");
+        uart_print((active_player == 1) ? "Blancas" : "Negras");
+        uart_print(" presiona - Turno de ");
+        uart_print((new_player == 1) ? "Blancas" : "Negras");
+        uart_print(" (B:");
         {
             char buf[10];
             uint8_t m = p1_time / 60;
@@ -307,7 +304,7 @@ static void clock_switch_player(void) {
             buf[5] = '\0';
             uart_print(buf);
         }
-        uart_print("  P2:");
+        uart_print("  N:");
         {
             char buf[10];
             uint8_t m = p2_time / 60;
@@ -368,7 +365,7 @@ static void clock_reset(void) {
         uart_print(buf);
     }
     uart_print(" por jugador\r\n");
-    uart_print("Presione P1 o P2 para iniciar\r\n");
+    uart_print("Presione BL (P1) o NG (P2) para iniciar\r\n");
 }
 
 /* Verificar si un jugador se quedó sin tiempo */
@@ -384,22 +381,22 @@ static void clock_check_timeout(void) {
     
     if (loser > 0) {
         state = CLOCK_GAME_OVER;
-        msg[0] = 'P';
-        msg[1] = '0' + loser;
-        msg[2] = ' ';
-        msg[3] = 'T';
-        msg[4] = 'I';
-        msg[5] = 'M';
-        msg[6] = 'E';
-        msg[7] = '!';
+        if (loser == 1) {
+            msg[0] = 'B'; msg[1] = 'L'; msg[2] = ' ';
+            msg[3] = 'L'; msg[4] = 'O'; msg[5] = 'S'; msg[6] = 'T';
+            msg[7] = ' ';
+        } else {
+            msg[0] = 'N'; msg[1] = 'G'; msg[2] = ' ';
+            msg[3] = 'L'; msg[4] = 'O'; msg[5] = 'S'; msg[6] = 'T';
+            msg[7] = ' ';
+        }
         msg[8] = '\0';
         sound_game_over();
         show_message(msg);
         
         uart_print("*** ");
-        uart_print("Jugador ");
-        rom_uart_putc('0' + loser);
-        uart_print(" se quedo sin tiempo!\r\n");
+        uart_print((loser == 1) ? "Blancas" : "Negras");
+        uart_print(" sin tiempo!\r\n");
         uart_print("-- Fin de la partida --\r\n");
     }
 }
@@ -563,8 +560,8 @@ int main(void) {
     uart_print("\r\n");
     uart_print("================================================\r\n");
     uart_print("Teclado TM1638:\r\n");
-    uart_print("  [ 1] [ 2] [ 3] [P1]    P1 = Jugador 1\r\n");
-    uart_print("  [ 5] [ 6] [ 7] [P2]    P2 = Jugador 2\r\n");
+    uart_print("  [ 1] [ 2] [ 3] [P1]    P1 = Blancas\r\n");
+    uart_print("  [ 5] [ 6] [ 7] [P2]    P2 = Negras\r\n");
     uart_print("  [ 9] [10] [11] [RST]   RST = Reiniciar\r\n");
     uart_print("  [ -] [ 0] [PAU] [SET]  PAU = Pausa, SET = Config\r\n");
     uart_print("  9(-) y 10(+) ajustan tiempo en config\r\n");
