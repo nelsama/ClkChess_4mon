@@ -128,6 +128,20 @@ static void sound_switch(void) {
     sound_timer = 8;
 }
 
+/* Entrar/salir de configuracion */
+static void sound_settings(void) {
+    sound_play(0, NOTE_C5, SID_TRIANGLE, 0, 8, 0, 8);
+    sound_timer = 12;
+}
+
+/* Bienvenida: acorde de Do mayor al iniciar */
+static void sound_welcome(void) {
+    sound_play(0, NOTE_C4, SID_SAWTOOTH, 0, 8, 12, 10);
+    sound_play(1, NOTE_E4, SID_TRIANGLE, 0, 8, 12, 10);
+    sound_play(2, NOTE_G4, SID_TRIANGLE, 0, 8, 12, 10);
+    sound_timer = 35;  /* ~1.75s */
+}
+
 /* Advertencia ultimos 10 segundos: beep corto y seco */
 static void sound_warning(void) {
     sound_play(0, NOTE_C7, SID_SAWTOOTH, 0, 4, 0, 2);
@@ -454,6 +468,7 @@ static void settings_enter(void) {
     if (state == CLOCK_SETTINGS) {
         /* Salir de configuración, guardar tiempo */
         init_time = settings_minutes * 60;
+        sound_settings();
         clock_reset();
         uart_print("Tiempo configurado: ");
         {
@@ -478,6 +493,7 @@ static void settings_enter(void) {
     if (settings_minutes > MAX_MINUTES) settings_minutes = MAX_MINUTES;
     
     state = CLOCK_SETTINGS;
+    sound_settings();
     uart_print("-- Modo configuracion --\r\n");
     uart_print("Use + y - para ajustar minutos. Presione SET para guardar.\r\n");
     settings_update_display();
@@ -599,6 +615,7 @@ int main(void) {
     
     /* Mostrar banner en display */
     tm1638_show_text(VERSION_DISPLAY);
+    sound_welcome();
     rom_delay_ms(1500);
     
     /* Inicializar tiempo por defecto */
@@ -685,10 +702,10 @@ int main(void) {
                 /* === MODO CONFIGURACIÓN === */
                 } else if (state == CLOCK_SETTINGS) {
                     if (key == KEY_INC) {
-                        sound_click();
+                        sound_switch();
                         settings_change(1);
                     } else if (key == KEY_DEC) {
-                        sound_click();
+                        sound_switch();
                         settings_change(-1);
                     } else if (key == KEY_P1 || key == KEY_P2) {
                         /* Salir y empezar partida */
