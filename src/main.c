@@ -139,17 +139,17 @@ static void sound_settings(void) {
     kill_timer = 0;
 }
 
-/* Bienvenida: campanilla (PULSE + TRIANGLE) */
+/* Bienvenida: campanilla (PULSE + TRIANGLE) - SIN kill, fade por release */
 static void sound_welcome(void) {
-    sound_play(0, NOTE_C5, SID_PULSE, 0, 8, 10, 4);
+    sound_play(0, NOTE_C5, SID_PULSE, 0, 8, 10, 6);
     SID_V1_PW_HI = 2048 >> 8;
     SID_V1_PW_LO = 2048 & 0xFF;
-    sound_play(1, NOTE_E4, SID_TRIANGLE, 0, 8, 6, 4);
-    sound_play(2, NOTE_G4, SID_PULSE, 0, 8, 4, 4);
+    sound_play(1, NOTE_E4, SID_TRIANGLE, 0, 8, 6, 6);
+    sound_play(2, NOTE_G4, SID_PULSE, 0, 8, 4, 6);
     SID_V3_PW_HI = 2048 >> 8;
     SID_V3_PW_LO = 2048 & 0xFF;
-    sound_timer = 8;
-    kill_timer = 0;
+    sound_timer = 8;    /* 400ms sustain, luego gate_off + release natural */
+    kill_timer = 0;     /* SIN kill abrupto */
 }
 
 /* Advertencia ultimos 10 segundos: beep corto y seco */
@@ -683,18 +683,20 @@ int main(void) {
             }
         }
         
-        /* Timer de sonido: fase 1 - fin del sustain */
+        /* Timer de sonido: fase 1 - gate_off */
         if (sound_timer > 0) {
             sound_timer--;
             if (sound_timer == 0) {
-                kill_timer = 5;   /* ~250ms de fade out */
+                sid_gate_off(0);
+                sid_gate_off(1);
+                sid_gate_off(2);
+                /* kill_timer lo pone cada sonido explicitamente si lo necesita */
             }
         }
         
-        /* Timer de sonido: fase 2 - fade out del volumen */
+        /* Timer de sonido: fase 2 - fade out (si el sonido lo activo) */
         if (kill_timer > 0) {
             uint8_t vol;
-            /* Escala exponencial: 15, 10, 6, 3, 1, 0 */
             switch (kill_timer) {
                 case 5: vol = 10; break;
                 case 4: vol = 6;  break;
@@ -703,9 +705,6 @@ int main(void) {
                 default: vol = 0; break;
             }
             sid_volume(vol);
-            sid_gate_off(0);
-            sid_gate_off(1);
-            sid_gate_off(2);
             kill_timer--;
             if (kill_timer == 0) {
                 sid_volume(0);
