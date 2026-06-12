@@ -137,8 +137,12 @@ static void sound_settings(void) {
 /* Bienvenida: campanilla (PULSE + TRIANGLE) */
 static void sound_welcome(void) {
     sound_play(0, NOTE_C5, SID_PULSE, 0, 8, 10, 10);
+    SID_V1_PW_HI = 2048 >> 8;  /* Pulse Width ~50% duty */
+    SID_V1_PW_LO = 2048 & 0xFF;
     sound_play(1, NOTE_E4, SID_TRIANGLE, 0, 8, 6, 8);
     sound_play(2, NOTE_G4, SID_PULSE, 0, 8, 4, 8);
+    SID_V3_PW_HI = 2048 >> 8;  /* Pulse Width ~50% duty */
+    SID_V3_PW_LO = 2048 & 0xFF;
     sound_timer = 35;
 }
 
