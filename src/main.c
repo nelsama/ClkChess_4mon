@@ -44,8 +44,8 @@
 #define DEFAULT_MINUTES 5       /* Tiempo por defecto: 5 minutos */
 #define MIN_MINUTES     1       /* Mínimo tiempo configurable */
 #define MAX_MINUTES     99      /* Máximo tiempo configurable */
-#define TICK_MS         50      /* Delay del loop principal (ms) */
-#define TICKS_PER_SEC   20      /* 20 ticks de 50ms = 1 segundo */
+#define TICK_MS         20      /* Delay del loop principal (ms) */
+#define TICKS_PER_SEC   50      /* 50 ticks de 20ms = 1 segundo (respaldo) */
 
 /* IDs de teclas del TM1638 */
 #define KEY_P1      4   /* Jugador 1 */
@@ -564,7 +564,8 @@ static uint8_t wait_key_release(uint8_t expected_key) {
 
 int main(void) {
     uint8_t key;
-    uint8_t tick_counter;   /* Contador de ticks para 1 segundo */
+    uint16_t last_timer;    /* Ultimo valor del timer 16-bit */
+    uint32_t total_us;      /* Microsegundos acumulados */
     uint8_t hold_result;
     
     /* Banner por UART */
@@ -604,7 +605,8 @@ int main(void) {
     init_time = DEFAULT_MINUTES * 60;
     clock_reset();
     
-    tick_counter = 0;
+    last_timer = (uint16_t)rom_get_micros();
+    total_us = 0;
     
     /* Loop principal */
     while (1) {
@@ -619,10 +621,14 @@ int main(void) {
             break;
         }
         
-        /* Tick: 20 iteraciones * 50ms = 1 segundo */
-        tick_counter++;
-        if (tick_counter >= TICKS_PER_SEC) {
-            tick_counter = 0;
+        /* Contador preciso: acumula microsegundos del timer 16-bit */
+        {
+            uint16_t now = (uint16_t)rom_get_micros();
+            total_us += (uint16_t)(now - last_timer);  /* Maneja wrappeo */
+            last_timer = now;
+        }
+        if (total_us >= 1000000UL) {
+            total_us -= 1000000UL;
             clock_tick();
         }
         
