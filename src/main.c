@@ -628,18 +628,18 @@ int main(void) {
     sid_volume(15);  /* Volumen maximo */
     
     /* Mostrar banner en display con sonido de bienvenida */
-        tm1638_show_text(VERSION_DISPLAY);
-        sound_welcome();
-        rom_delay_ms(50);           /* 50ms sustain */
-        sid_gate_off(0);
-        sid_gate_off(1);
-        sid_gate_off(2);
-        rom_delay_ms(100);          /* 100ms release fade */
-        sound_kill(0);
-        sound_kill(1);
-        sound_kill(2);
-        sid_volume(15);             /* Restaurar volumen */
-        rom_delay_ms(1350);         /* Resto del banner ~1.5s total */
+    tm1638_show_text(VERSION_DISPLAY);
+    sound_welcome();
+    rom_delay_ms(300);          /* 300ms sustain */
+    sid_gate_off(0);
+    sid_gate_off(1);
+    sid_gate_off(2);
+    rom_delay_ms(300);          /* 300ms release fade */
+    sound_kill(0);
+    sound_kill(1);
+    sound_kill(2);
+    sid_volume(15);             /* Restaurar volumen */
+    rom_delay_ms(900);          /* Resto del banner ~1.5s total */
     
     /* Inicializar tiempo por defecto */
     init_time = DEFAULT_MINUTES * 60;
