@@ -685,8 +685,10 @@ int main(void) {
                 /* === MODO CONFIGURACIÓN === */
                 } else if (state == CLOCK_SETTINGS) {
                     if (key == KEY_INC) {
+                        sound_click();
                         settings_change(1);
                     } else if (key == KEY_DEC) {
+                        sound_click();
                         settings_change(-1);
                     } else if (key == KEY_P1 || key == KEY_P2) {
                         /* Salir y empezar partida */
