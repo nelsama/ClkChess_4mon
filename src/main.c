@@ -101,7 +101,9 @@ static uint8_t sound_timer;         /* Timer para apagar sonidos sostenidos */
 static void sound_play(uint8_t voice, uint16_t freq, uint8_t wave,
                        uint8_t a, uint8_t d, uint8_t s, uint8_t r) {
     sid_gate_off(voice);
+    rom_delay_us(500);  /* Esperar a que el SID registre gate=0 */
     sid_voice(voice, freq, wave, a, d, s, r);
+    rom_delay_us(500);  /* Esperar a que el SID registre nuevos params */
     sid_gate_on(voice);
 }
 
