@@ -91,7 +91,8 @@ static uint8_t key_processed;       /* Flag de tecla procesada */
 static uint8_t blink_counter;       /* Contador para parpadeo (cada 500ms) */
 static uint8_t blink_state;         /* 1 = visible, 0 = oculto */
 
-static uint8_t sound_timer;         /* Timer para apagar sonidos sostenidos */
+static uint8_t sound_timer;         /* Timer para iniciar release (gate_off) */
+static uint8_t kill_timer;          /* Timer para kill total post-release */
 
 /* Forzar silencio total en una voz (escribe 0 en control) */
 static void sound_kill(uint8_t voice) {
@@ -119,37 +120,42 @@ static void sound_play(uint8_t voice, uint16_t freq, uint8_t wave,
 /* Click al presionar tecla */
 static void sound_click(void) {
     sound_play(0, NOTE_C7, SID_NOISE, 0, 8, 0, 2);
-    sound_timer = 8;  /* ~400ms, luego kill */
+    sound_timer = 8;
+    kill_timer = 0;
 }
 
 /* Cambio de turno */
 static void sound_switch(void) {
     sound_play(0, NOTE_A5, SID_TRIANGLE, 0, 6, 0, 4);
     sound_timer = 8;
+    kill_timer = 0;
 }
 
 /* Entrar/salir de configuracion */
 static void sound_settings(void) {
     sound_play(0, NOTE_C5, SID_TRIANGLE, 0, 8, 0, 8);
     sound_timer = 12;
+    kill_timer = 0;
 }
 
 /* Bienvenida: campanilla (PULSE + TRIANGLE) */
 static void sound_welcome(void) {
     sound_play(0, NOTE_C5, SID_PULSE, 0, 8, 10, 10);
-    SID_V1_PW_HI = 2048 >> 8;  /* Pulse Width ~50% duty */
+    SID_V1_PW_HI = 2048 >> 8;
     SID_V1_PW_LO = 2048 & 0xFF;
     sound_play(1, NOTE_E4, SID_TRIANGLE, 0, 8, 6, 8);
     sound_play(2, NOTE_G4, SID_PULSE, 0, 8, 4, 8);
-    SID_V3_PW_HI = 2048 >> 8;  /* Pulse Width ~50% duty */
+    SID_V3_PW_HI = 2048 >> 8;
     SID_V3_PW_LO = 2048 & 0xFF;
-    sound_timer = 35;
+    sound_timer = 20;   /* ~1s de sustain, luego release (fade) */
+    kill_timer = 0;     /* kill_timer se activa al hacer gate_off */
 }
 
 /* Advertencia ultimos 10 segundos: beep corto y seco */
 static void sound_warning(void) {
     sound_play(0, NOTE_C7, SID_SAWTOOTH, 0, 4, 0, 2);
-    sound_timer = 6;  /* ~300ms */
+    sound_timer = 6;
+    kill_timer = 0;
 }
 
 /* Fin del juego: acorde sostenido y fuerte (3 voces) */
@@ -157,19 +163,22 @@ static void sound_game_over(void) {
     sound_play(0, NOTE_C4, SID_SAWTOOTH, 0, 8, 10, 10);
     sound_play(1, NOTE_E4, SID_SAWTOOTH, 0, 8, 10, 10);
     sound_play(2, NOTE_G4, SID_SAWTOOTH, 0, 8, 10, 10);
-    sound_timer = 60;  /* ~3 segundos */
+    sound_timer = 40;  /* ~2s sustain, luego release */
+    kill_timer = 0;
 }
 
 /* Pausa */
 static void sound_pause(void) {
     sound_play(0, NOTE_C5, SID_TRIANGLE, 0, 8, 0, 6);
     sound_timer = 10;
+    kill_timer = 0;
 }
 
 /* Reanudar */
 static void sound_resume(void) {
     sound_play(0, NOTE_E5, SID_TRIANGLE, 0, 8, 0, 6);
     sound_timer = 10;
+    kill_timer = 0;
 }
 
 /* ============================================================================
@@ -673,10 +682,21 @@ int main(void) {
             }
         }
         
-        /* Timer de sonido: apagar voces cuando expira */
+        /* Timer de sonido: fase 1 - gate_off (inicia release/fade) */
         if (sound_timer > 0) {
             sound_timer--;
             if (sound_timer == 0) {
+                sid_gate_off(0);
+                sid_gate_off(1);
+                sid_gate_off(2);
+                kill_timer = 15;  /* ~750ms para que termine el release */
+            }
+        }
+        
+        /* Timer de sonido: fase 2 - kill total post-release */
+        if (kill_timer > 0) {
+            kill_timer--;
+            if (kill_timer == 0) {
                 sound_kill(0);
                 sound_kill(1);
                 sound_kill(2);
