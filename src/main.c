@@ -108,6 +108,7 @@ static void sound_kill(uint8_t voice) {
 /* Resetear voz y tocar una nota */
 static void sound_play(uint8_t voice, uint16_t freq, uint8_t wave,
                        uint8_t a, uint8_t d, uint8_t s, uint8_t r) {
+    sid_volume(15);              /* Restaurar volumen (por si estaba en fade) */
     sid_gate_off(voice);
     rom_delay_us(300);
     sound_kill(voice);           /* Apagar oscilador por completo */
@@ -682,21 +683,27 @@ int main(void) {
             }
         }
         
-        /* Timer de sonido: fase 1 - gate_off (inicia release/fade) */
+        /* Timer de sonido: fase 1 - gate_off + inicio fade de volumen */
         if (sound_timer > 0) {
             sound_timer--;
             if (sound_timer == 0) {
                 sid_gate_off(0);
                 sid_gate_off(1);
                 sid_gate_off(2);
-                kill_timer = 15;  /* ~750ms para que termine el release */
+                kill_timer = 8;   /* ~400ms de fade out por volumen */
             }
         }
         
-        /* Timer de sonido: fase 2 - kill total post-release */
+        /* Timer de sonido: fase 2 - fade out progresivo del volumen */
         if (kill_timer > 0) {
             kill_timer--;
+            {
+                /* Volumen proporcional: 15, 13, 11, 9, 7, 5, 3, 1, 0 */
+                uint8_t vol = (uint8_t)(((uint16_t)kill_timer * 15 + 7) / 8);
+                sid_volume(vol);
+            }
             if (kill_timer == 0) {
+                sid_volume(0);
                 sound_kill(0);
                 sound_kill(1);
                 sound_kill(2);
