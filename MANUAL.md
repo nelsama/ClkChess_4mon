@@ -224,7 +224,8 @@ El Reloj de Ajedrez usa el chip **SID 6581** con 3 voces independientes. Todos l
 
 ### Volumen
 
-El volumen maestro está configurado al máximo (15). No es ajustable desde el menú.
+El volumen maestro está configurado al máximo (15) para todos los efectos.
+La melodía de bienvenida usa volumen 5/15 para no ser estridente. No es ajustable desde el menú.
 
 ---
 
